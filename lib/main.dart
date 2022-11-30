@@ -1,6 +1,12 @@
+import 'dart:developer';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:beamer/beamer.dart';
 import 'package:flutter_app_01/pages/details_screen.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'dart:async';
 
 import 'data/deceased_data.dart';
 
@@ -46,12 +52,48 @@ const List<Map<String, dynamic>> deceased = [
   }
 ];
 
-final deceasedList =
-    deceased.map((rawProduct) => DeceasedData.fromJson(rawProduct));
+final deceasedList = deceased.map((e) => DeceasedData.fromJson(e));
+
+Future<DeceasedData> fetchDeceasedData() async {
+  final response = await http.get(
+      Uri.parse(
+          'http://localhost:5208/api/deceased/read?dId=9851a435-7aaf-440f-9118-ee0888e49646'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization':
+            'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiY2IwMTQyOWYtZTk3YS00ZjJjLThlN2UtZTkwNmIyMDg2NTkyIiwibmJmIjoxNjY5ODI0NTkxLCJleHAiOjE2Njk4MjgxOTEsImlhdCI6MTY2OTgyNDU5MSwiaXNzIjoiT2FrVGVjaG5vbG9neSIsImF1ZCI6IlJlc29tYXRpb24ifQ.FSr--WKXF0UU3TiX0hpXEZD_ZBMp76rQISP17QUCWkI',
+      });
+
+  if (response.statusCode == 200) {
+    // If the server did return a 200 OK response,
+    // then parse the JSON.
+    log(jsonDecode(response.toString()));
+    return DeceasedData.fromJson(jsonDecode(response.body));
+  } else {
+    // If the server did not return a 200 OK response,
+    // then throw an exception.
+    throw Exception('Failed to load data');
+  }
+}
 
 // SCREENS
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
+
+  @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+  late Future<DeceasedData> deceasedData;
+
+  @override
+  void initState() {
+    super.initState();
+    deceasedData = fetchDeceasedData();
+    log("wow");
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -235,6 +277,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp.router(
       routerDelegate: routerDelegate,
       routeInformationParser: BeamerParser(),
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(useMaterial3: true),
     );
   }
