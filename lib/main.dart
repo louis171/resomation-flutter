@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:beamer/beamer.dart';
+import 'package:flutter_app_01/pages/details_screen.dart';
 
 import 'data/deceased_data.dart';
 
@@ -12,24 +13,36 @@ const List<Map<String, dynamic>> deceased = [
     "dTitle": "Miss",
     "dForenames": "Farrah",
     "dSurname": "Glennson",
-    "dCommitalDate": "2022-12-02T10:00:00",
-    "dCommitalLocation": "Local FD Branch",
+    "dCommitalDate": "2022-12-02T09:00:00",
+    "dCommitalLocation":
+        "Local FD Branch, 123 FD Street, AnyTown, AnyCounty, AN1 TWN",
   },
   {
     "dId": "35d9bc10-24e5-4fa1-aa48-f40b966b7ccd",
     "dTitle": "Mr",
     "dForenames": "Alan",
     "dSurname": "Harrison",
-    "dCommitalDate": "2022-12-03T09:00:00",
-    "dCommitalLocation": "Local FD Branch",
+    "dCommitalDate": "2022-12-05T09:30:00",
+    "dCommitalLocation":
+        "Local FD Branch, 123 FD Street, AnyTown, AnyCounty, AN1 TWN",
   },
   {
     "dId": "59257205-e972-4897-a4c8-1a810e8fc8e5",
     "dTitle": "Mrs",
     "dForenames": "Julie",
     "dSurname": "Kenn",
+    "dCommitalDate": "2022-12-07T10:00:00",
+    "dCommitalLocation":
+        "Local FD Branch, 123 FD Street, AnyTown, AnyCounty, AN1 TWN",
+  },
+  {
+    "dId": "477a573a-2e54-47a7-b457-ac4225706c48",
+    "dTitle": "Mr",
+    "dForenames": "Jack",
+    "dSurname": "Guest",
     "dCommitalDate": "2022-12-03T09:00:00",
-    "dCommitalLocation": "Local FD Branch",
+    "dCommitalLocation":
+        "Local FD Branch, 123 FD Street, AnyTown, AnyCounty, AN1 TWN",
   }
 ];
 
@@ -49,14 +62,15 @@ class DashboardScreen extends StatelessWidget {
         body: Padding(
           padding: const EdgeInsets.all(10.0),
           child: GridView.count(
-              childAspectRatio: 3,
+              childAspectRatio: 2.8,
               primary: false,
               crossAxisSpacing: 10,
               mainAxisSpacing: 10,
               crossAxisCount: 1,
               children: deceasedList
-                  .map((DeceasedData deceased) =>
-                      DeceasedCard(deceased: deceased))
+                  .map(
+                    (DeceasedData deceased) => DeceasedCard(deceased: deceased),
+                  )
                   .toList()),
         ));
   }
@@ -88,17 +102,31 @@ class SettingsScreen extends StatelessWidget {
 // LOCATIONS
 class DashboardLocation extends BeamLocation<BeamState> {
   @override
-  List<String> get pathPatterns => ['/dashboard'];
+  List<Pattern> get pathPatterns => ['/dashboard/:dId'];
 
   @override
-  List<BeamPage> buildPages(BuildContext context, BeamState state) => [
-        const BeamPage(
-          key: ValueKey('dashboard'),
-          title: 'Dashboard',
-          type: BeamPageType.slideLeftTransition,
-          child: DashboardScreen(),
+  List<BeamPage> buildPages(BuildContext context, BeamState state) {
+    final pages = [
+      const BeamPage(
+        key: ValueKey('dashboard'),
+        title: 'dashboard',
+        type: BeamPageType.slideLeftTransition,
+        child: DashboardScreen(),
+      ),
+    ];
+    final String? dIdParameter = state.pathParameters['dId'];
+    if (dIdParameter != null) {
+      pages.add(
+        BeamPage(
+          key: ValueKey('book-$dIdParameter'),
+          title: 'Book #$dIdParameter',
+          type: BeamPageType.fadeTransition,
+          child: DetailsScreen(dId: dIdParameter),
         ),
-      ];
+      );
+    }
+    return pages;
+  }
 }
 
 class SettingsLocation extends BeamLocation<BeamState> {

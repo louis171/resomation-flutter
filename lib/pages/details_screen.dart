@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:beamer/beamer.dart';
 
 /// The details screen
 class DetailsScreen extends StatelessWidget {
   /// Constructs a [DetailsScreen]
-  const DetailsScreen({Key? key}) : super(key: key);
+
+  const DetailsScreen({Key? key, required this.dId}) : super(key: key);
+
+  final String dId;
 
   @override
   Widget build(BuildContext context) {
@@ -12,29 +16,16 @@ class DetailsScreen extends StatelessWidget {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <ElevatedButton>[
+          children: <Widget>[
             ElevatedButton(
-              onPressed: () {},
-              child: const Text('Go back to the Home screen'),
+              onPressed: () {
+                context.beamToNamed("/dashboard");
+              },
+              child: const Text('dashboard'),
             ),
+            Text(dId)
           ],
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.call),
-            label: 'Calls',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.camera),
-            label: 'Camera',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.chat),
-            label: 'Chats',
-          ),
-        ],
       ),
     );
   }
